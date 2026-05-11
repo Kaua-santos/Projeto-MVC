@@ -43,11 +43,11 @@ def cadastrar_user(
 
     if user_existente:
         # retorna o formulario com mensagem de erro
-        return templates.TemplateResponse(
-            request,
-            "auth/cadastro",
-            {"request": request, "erro": "este e-mail ja esta cadastrado"}
-        )
+       return templates.TemplateResponse(
+    request,
+    "auth/cadastro.html",
+    {"request": request, "erro": "este e-mail ja esta cadastrado"}
+)
     
     # criar um novo usuario com senha hash
     novo_usuario = Usuario(
@@ -61,3 +61,53 @@ def cadastrar_user(
     # redirecionar para a tela de login
     return RedirectResponse(url="/auth/login?cadastro=ok", status_code=302)
 
+# rota de login
+@router.post("/login")
+def fazer_login(
+    request: Request,
+    email: str = Form(...),
+    senha: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    # buscar o usuario pelo email
+    usuario = db.query(Usuario).filter_by(email=email).first()
+
+    # verificar a senha com bcrypt
+    senha_correta = ( usuario is not None and (senha, usuario.senha_hash) )
+    if not senha_correta:
+        return templates.TemplateResponse(
+            request,
+            "auth/login.html",
+            {"request": request, "erro": "email ou senha incorretos"}
+        )
+    
+    if not usuario.ativo:
+        return templates.TemplateResponse(
+            request,
+            "auth/login.html",
+            {"request": request, "erro": "usuario inativo!"}
+        )
+
+
+    # Gere o token JWT
+    token_data = {
+        "sub": usuario.email,
+        "nome": usuario.nome,
+        "role": usuario.role,
+        "id": usuario.id,
+        }
+
+    token = criar_token(token_data)
+    # salvar o token em cookie HTTPOnly
+    response = RedirectResponse(url="/", status_code=302)
+
+    response.set_cookie(
+        key="acess_token",
+        value=token,
+        httponly=True,
+        max_age=3600,
+        samesite="lax"
+    )
+ 
+    # redirecionar para a pagina inicial
+    return response 

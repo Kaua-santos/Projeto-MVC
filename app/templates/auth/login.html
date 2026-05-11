@@ -11,7 +11,9 @@
     <form action="/auth/login" method="post">
 
         <!-- exibe confirmação apos cadastro feito -->
-         {% if request.query.get("cadastro") == "ok" %}
+
+        <!-- ✅ Correto -->
+        {% if request.query_params.get("cadastro") == "ok" %}
          <p style="color: green;">cadastro realizado com sucesso! Faça login.</p>
         {% endif %}
 
