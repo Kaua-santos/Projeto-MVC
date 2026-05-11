@@ -9,6 +9,12 @@
     <h1>Entrar no sistema </h1>
 
     <form action="/auth/login" method="post">
+
+        <!-- exibe confirmação apos cadastro feito -->
+         {% if request.query.get("cadastro") == "ok" %}
+         <p style="color: green;">cadastro realizado com sucesso! Faça login.</p>
+        {% endif %}
+
         Nome: <input type="text" name="nome">
         <br><br>
         E-mail: <input type="text" name="email" required>

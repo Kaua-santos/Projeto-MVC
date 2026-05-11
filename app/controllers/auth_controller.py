@@ -60,3 +60,4 @@ def cadastrar_user(
     db.commit()
     # redirecionar para a tela de login
     return RedirectResponse(url="/auth/login?cadastro=ok", status_code=302)
+
