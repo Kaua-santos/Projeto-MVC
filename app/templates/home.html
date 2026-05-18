@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · {{ usuario.nome }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: #1e1e2e;
+      --accent: #7c6dfa;
+      --accent2: #4fd1b5;
+      --text: #f0eeff;
+      --muted: #7a7a9a;
+      --card-bg: #13131c;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.1;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 { width: 500px; height: 500px; background: var(--accent); top: -150px; right: -100px; }
+    .blob-2 { width: 350px; height: 350px; background: var(--accent2); bottom: -80px; left: -60px; }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-logo .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-user {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .nav-logout {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.38rem 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .nav-logout:hover { color: #f87171; border-color: rgba(248, 113, 113, 0.4); }
+
+    /* MAIN */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    /* GREETING */
+    .greeting {
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+
+    .greeting-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 0.6rem;
+    }
+
+    .greeting h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+
+    .greeting h1 .name { color: var(--accent); }
+
+    .greeting-sub {
+      margin-top: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    /* PROFILE CARD */
+    .profile-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.25s forwards;
+      transition: border-color 0.25s;
+    }
+    .profile-card:hover { border-color: #2e2e4e; }
+
+    .avatar {
+      flex-shrink: 0;
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .profile-info { flex: 1; }
+
+    .profile-info h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.28rem 0.75rem;
+      border-radius: 20px;
+    }
+
+    .role-admin {
+      background: rgba(124, 109, 250, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(124, 109, 250, 0.25);
+    }
+    .role-user {
+      background: rgba(79, 209, 181, 0.1);
+      color: var(--accent2);
+      border: 1px solid rgba(79, 209, 181, 0.22);
+    }
+    .role-badge::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* INFO GRID */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.4s forwards;
+    }
+
+    .info-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.4rem 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .info-card:hover { border-color: #2a2a44; transform: translateY(-3px); }
+
+    .info-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .info-icon {
+      font-size: 1.3rem;
+      margin-bottom: 0.75rem;
+    }
+
+    /* DIVIDER */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 2.5rem 0;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.55s forwards;
+    }
+
+    /* QUICK ACTIONS */
+    .actions-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: -0.01em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.6s forwards;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.7s forwards;
+    }
+
+    .action-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.6rem 1.25rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+    }
+    .action-primary:hover { opacity: 0.85; transform: translateY(-2px); }
+
+    .action-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .action-ghost:hover { color: var(--text); border-color: #3a3a5a; transform: translateY(-2px); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 0.9rem 1.25rem; }
+      main { padding: 2.5rem 1.25rem 4rem; }
+      .profile-card { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <span class="dot"></span>
+    Projeto MVC
+  </a>
+  <div class="nav-right">
+    <span class="nav-user">{{ usuario.nome }}</span>
+    <a href="/auth/logout" class="nav-logout">Sair</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- GREETING -->
+  <div class="greeting">
+    <p class="greeting-label">Dashboard</p>
+    <h1>Olá, <span class="name">{{ usuario.nome }}</span> 👋</h1>
+    <p class="greeting-sub">Bem-vindo de volta ao sistema de gestão.</p>
+  </div>
+
+  <!-- PROFILE CARD -->
+  <div class="profile-card">
+    <div class="avatar">
+      {{ usuario.nome[0] | upper }}
+    </div>
+    <div class="profile-info">
+      <h2>{{ usuario.nome }}</h2>
+      <span class="role-badge {% if usuario.role == 'admin' %}role-admin{% else %}role-user{% endif %}">
+        {{ usuario.role }}
+      </span>
+    </div>
+  </div>
+
+  <!-- INFO CARDS -->
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-icon">👤</div>
+      <p class="info-label">Nome</p>
+      <p class="info-value">{{ usuario.nome }}</p>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">🎖️</div>
+      <p class="info-label">Perfil</p>
+      <p class="info-value">{{ usuario.role }}</p>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">✅</div>
+      <p class="info-label">Status</p>
+      <p class="info-value">Ativo</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- QUICK ACTIONS -->
+  <p class="actions-title">Ações rápidas</p>
+  <div class="actions">
+    <a href="/docs" class="action-btn action-ghost">📄 API Docs</a>
+  </div>
+
+</main>
+
+</body>
+</html>
