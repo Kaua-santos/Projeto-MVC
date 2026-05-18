@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% if usuario %}Editar{% else %}Novo{% endif %} Usuário — Estoque</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: #1e1e2e;
+      --accent: #7c6dfa;
+      --accent2: #4fd1b5;
+      --text: #f0eeff;
+      --muted: #7a7a9a;
+      --card-bg: #13131c;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 450px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      border-radius: 14px;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.75rem;
+      letter-spacing: -0.04em;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    input, select {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .btn-submit {
+      font-family: 'DM Sans', sans-serif;
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: opacity 0.2s;
+    }
+
+    .btn-submit:hover { opacity: 0.85; }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.25rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<main>
+  <h1>{% if usuario %}Editar Usuário{% else %}Novo Usuário{% endif %}</h1>
+  
+  <form action="{% if usuario %}/usuarios/{{ usuario.id }}/editar{% else %}/usuarios/novo{% endif %}" method="POST">
+    
+    <div class="form-group">
+      <label for="nome">Nome Completo</label>
+      <input type="text" id="nome" name="nome" value="{{ usuario.nome if usuario else '' }}" required />
+    </div>
+
+    <div class="form-group">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" value="{{ usuario.email if usuario else '' }}" required />
+    </div>
+
+    {% if not usuario %}
+    <div class="form-group">
+      <label for="senha_hash">Senha</label>
+      <input type="password" id="senha_hash" name="senha" required />
+    </div>
+    {% endif %}
+
+    <div class="form-group">
+      <label for="role">Perfil de Acesso</label>
+      <select id="role" name="role">
+        <option value="operador" {% if usuario and usuario.role == 'operador' %}selected{% endif %}>operador</option>
+        <option value="admin" {% if usuario and usuario.role == 'admin' %}selected{% endif %}>admin</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn-submit">
+      {% if usuario %}Salvar Alterações{% else %}Cadastrar Usuário{% endif %}
+    </button>
+    
+    <a href="/usuarios" class="back-link">← Cancelar e voltar</a>
+  </form>
+</main>
+
+</body>
+</html>

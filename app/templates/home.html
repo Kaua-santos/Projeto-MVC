@@ -350,14 +350,12 @@
 
 <main>
 
-  <!-- GREETING -->
   <div class="greeting">
     <p class="greeting-label">Dashboard</p>
     <h1>Olá, <span class="name">{{ usuario.nome }}</span> 👋</h1>
     <p class="greeting-sub">Bem-vindo de volta ao sistema de gestão.</p>
   </div>
 
-  <!-- PROFILE CARD -->
   <div class="profile-card">
     <div class="avatar">
       {{ usuario.nome[0] | upper }}
@@ -370,7 +368,6 @@
     </div>
   </div>
 
-  <!-- INFO CARDS -->
   <div class="info-grid">
     <div class="info-card">
       <div class="info-icon">👤</div>
@@ -391,9 +388,12 @@
 
   <div class="divider"></div>
 
-  <!-- QUICK ACTIONS -->
   <p class="actions-title">Ações rápidas</p>
   <div class="actions">
+    {% if usuario.role == 'admin' %}
+      <a href="/usuarios" class="action-btn action-primary">👥 Gerenciar Usuários</a>
+    {% endif %}
+    
     <a href="/docs" class="action-btn action-ghost">📄 API Docs</a>
   </div>
 
