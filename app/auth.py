@@ -71,3 +71,14 @@ def get_usuario_opcional(request: Request):
         return get_usuario_logado(request)
     except HTTPException:
         None
+
+# Dependencia do fastapi para administradore
+def get_admin(request: Request):
+    ususario = get_usuario_logado(request)
+
+    if ususario.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso apenas para administradores"
+        )
+    return ususario
