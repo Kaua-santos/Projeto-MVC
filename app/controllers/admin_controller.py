@@ -51,7 +51,7 @@ def criar_usuario(
     nome: str = Form(...), email: str = Form(...), senha: str = Form(...),
     role: str = Form("user"), db: Session = Depends(get_db), admin = Depends(get_admin)
 ):
-    novo_usuario = Usuario(nome=nome, email=email, senha=hash_senha(senha), role=role, ativo=True)
+    novo_usuario = Usuario(nome=nome, email=email, senha_hash=hash_senha(senha), role=role, ativo=True)
     db.add(novo_usuario)
     db.commit()
     return RedirectResponse(url="/usuarios?criado=ok", status_code=status.HTTP_303_SEE_OTHER)
