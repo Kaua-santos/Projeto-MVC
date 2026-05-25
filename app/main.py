@@ -6,6 +6,8 @@ from app.auth import get_usuario_opcional
 
 from app.controllers import auth_controller
 from app.controllers import admin_controller
+from app.controllers import categoria_controller
+from app.controllers import produto_controller
 
 app = FastAPI(title="Sistema estoque")
 
@@ -17,6 +19,9 @@ templates = Jinja2Templates(directory="app/templates")
 # Incluir os routers dos controles 
 app.include_router(auth_controller.router)
 app.include_router(admin_controller.router)
+app.include_router(categoria_controller.router)
+app.include_router(produto_controller.router)
+
 # Tela inicial 
 @app.get("/")
 def home(request: Request,
@@ -35,3 +40,4 @@ def home(request: Request,
         "home.html",
         {"request": request, "usuario": usuario}
     )
+

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ "Editar" if editando else "Nova" }} Categoria — AAPM SENAI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: #1e1e2e;
+      --accent: #7c6dfa;
+      --accent2: #4fd1b5;
+      --text: #f0eeff;
+      --muted: #7a7a9a;
+      --card-bg: #13131c;
+      --danger: #f87171;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.1;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 { width: 500px; height: 500px; background: var(--accent); top: -150px; right: -100px; }
+    .blob-2 { width: 350px; height: 350px; background: var(--accent2); bottom: -80px; left: -60px; }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-logo .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    /* MAIN */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    /* HEADER SECTION */
+    .page-header {
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+
+    .page-header p {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 0.6rem;
+    }
+
+    .page-header h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+
+    /* ERROR ALERT */
+    .alert-danger {
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      background: rgba(248, 113, 113, 0.08);
+      color: var(--danger);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    /* FORM CARD */
+    .form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.25s forwards;
+    }
+
+    .form-group {
+      margin-bottom: 1.75rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+      width: 100%;
+      background: rgba(10, 10, 15, 0.5);
+      border: 1px solid var(--border);
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(124, 109, 250, 0.2);
+    }
+
+    /* BUTTONS */
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      flex: 1;
+    }
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 0.7rem 1.5rem;
+    }
+    .btn-ghost:hover { color: var(--text); border-color: #3a3a5a; }
+
+    /* CONTEXT PRODUCTS SECTION */
+    .products-ctx {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px dashed var(--border);
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.4s forwards;
+    }
+
+    .products-ctx h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .product-list {
+      list-style: none;
+    }
+
+    .product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: rgba(25, 25, 35, 0.3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .product-item a {
+      color: var(--accent2);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .product-item a:hover { text-decoration: underline; }
+
+    .product-price {
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-weight: 500;
+    }
+
+    .no-products {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .form-actions { flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <span class="dot"></span>
+    Projeto MVC
+  </a>
+</nav>
+
+<main>
+
+  {% if erro %}
+      <div class="alert-danger">⚠️ {{ erro }}</div>
+  {% endif %}
+
+  <div class="page-header">
+    <p>{{ "Alterar Registro" if editando else "Cadastro" }}</p>
+    <h1>{{ "Editar Categoria" if editando else "Nova Categoria" }}</h1>
+  </div>
+
+  <div class="form-card">
+    <form action="{{ '/categorias/' + editando.id|string + '/editar' if editando else '/categorias/nova' }}" method="post">
+        
+        <div class="form-group">
+            <label for="nome">Nome da Categoria</label>
+            <input type="text" 
+                   id="nome"
+                   name="nome" 
+                   class="form-control"
+                   value="{{ editando.nome if editando else (valores.nome if valores else '') }}" 
+                   placeholder="Ex: Eletrônicos, Vestuário..."
+                   required 
+                   autofocus>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                {{ "Salvar Alterações" if editando else "Criar Categoria" }}
+            </button>
+            <a href="/categorias" class="btn btn-ghost">Cancelar</a>
+        </div>
+    </form>
+  </div>
+
+  {% if editando and editando.produtos %}
+      <div class="products-ctx">
+          <h3>Produtos vinculados a esta categoria</h3>
+          <ul class="product-list">
+              {% for p in editando.produtos if p.ativo %}
+                  <li class="product-item">
+                      <a href="/produtos/{{ p.id }}">📦 {{ p.nome }}</a>
+                      <span class="product-price">R$ {{ "%.2f"|format(p.preco) }}</span>
+                  </li>
+              {% else %}
+                  <li class="no-products">Nenhum produto ativo vinculado.</li>
+              {% endfor %}
+          </ul>
+      </div>
+  {% endif %}
+
+</main>
+
+</body>
+</html>

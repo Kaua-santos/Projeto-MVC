@@ -1,0 +1,318 @@
+<!-- produtos/form.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ "Editar" if editando else "Novo" }} Produto — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #0d0f12;
+            --surface:   #141720;
+            --surface2:  #1c2030;
+            --border:    #252a3a;
+            --accent:    #e8c547;
+            --accent2:   #4a7cf7;
+            --text:      #e2e6f0;
+            --muted:     #6b738a;
+            --danger:    #f05252;
+            --success:   #34d399;
+            --radius:    10px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        /* ── Header ── */
+        .page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 36px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+        }
+
+        .page-header h1 span { color: var(--accent); }
+
+        .breadcrumb {
+            font-size: 12px;
+            color: var(--muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color .2s;
+        }
+        .breadcrumb:hover { color: var(--accent); }
+
+        /* ── Alert ── */
+        .alert-error {
+            padding: 12px 18px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            background: rgba(240,82,82,.08);
+            border: 1px solid rgba(240,82,82,.25);
+            color: var(--danger);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown .3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Form card ── */
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 32px;
+        }
+
+        .field {
+            margin-bottom: 24px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+            font-family: 'Syne', sans-serif;
+        }
+
+        .field input[type="text"],
+        .field input[type="number"],
+        .field select {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 14px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            appearance: none;
+        }
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--accent2);
+            box-shadow: 0 0 0 3px rgba(74,124,247,.12);
+        }
+        .field input::placeholder { color: var(--muted); }
+
+        /* File input */
+        .file-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            background: var(--surface2);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--muted);
+            transition: border-color .2s, color .2s;
+        }
+        .file-label:hover { border-color: var(--accent2); color: var(--text); }
+        .field input[type="file"] { display: none; }
+
+        /* Current image */
+        .current-img-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+        }
+        .current-img-wrap img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .current-img-wrap span {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* Divider */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 28px 0;
+        }
+
+        /* Actions */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 12px 22px;
+            border-radius: var(--radius);
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: all .2s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #0d0f12;
+        }
+        .btn-primary:hover { background: #f5d55e; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(232,197,71,.25); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <div class="page-header">
+        <h1>
+            {% if editando %}
+                Editar <span>Produto</span>
+            {% else %}
+                Novo <span>Produto</span>
+            {% endif %}
+        </h1>
+        <a href="/produtos" class="breadcrumb">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            Produtos
+        </a>
+    </div>
+
+    {% if erro %}
+        <div class="alert-error">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            {{ erro }}
+        </div>
+    {% endif %}
+
+    <div class="form-card">
+        <form action="{{ '/produtos/' + editando.id|string + '/editar' if editando else '/produtos/novo' }}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <div class="field">
+                <label>Nome do produto</label>
+                <input type="text" name="nome"
+                       placeholder="Ex: Camiseta SENAI"
+                       value="{{ editando.nome if editando else (valores.nome if valores else '') }}"
+                       required>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+                <div class="field">
+                    <label>Preço (R$)</label>
+                    <input type="number" name="preco" step="0.01" min="0"
+                           value="{{ editando.preco if editando else (valores.preco if valores else '0.00') }}"
+                           required>
+                </div>
+                <div class="field">
+                    <label>Estoque atual</label>
+                    <input type="number" name="estoque_atual" min="0"
+                           value="{{ editando.estoque_atual if editando else (valores.estoque_atual if valores else '0') }}"
+                           required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Categoria</label>
+                <select name="categoria_id">
+                    <option value="0">Sem categoria</option>
+                    {% for c in categorias %}
+                        <option value="{{ c.id }}"
+                            {{ 'selected' if (editando and editando.categoria_id == c.id) or (valores and valores.categoria_id == c.id) else '' }}>
+                            {{ c.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <hr class="divider">
+
+            <div class="field">
+                <label>{{ "Nova imagem" if editando else "Imagem" }}</label>
+
+                {% if editando and editando.imagem_path %}
+                    <div class="current-img-wrap">
+                        <img src="{{ editando.imagem_url }}" alt="{{ editando.nome }}">
+                        <span>Imagem atual — envie uma nova para substituir</span>
+                    </div>
+                {% endif %}
+
+                <label class="file-label" for="imagem-input">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    <span id="file-text">Clique para selecionar um arquivo...</span>
+                </label>
+                <input type="file" id="imagem-input" name="imagem" accept=".jpg,.jpeg,.png,.webp"
+                       onchange="document.getElementById('file-text').textContent = this.files[0]?.name || 'Clique para selecionar...'">
+            </div>
+
+            <hr class="divider">
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                    {{ "Salvar alterações" if editando else "Criar produto" }}
+                </button>
+                <a href="/produtos" class="btn btn-ghost">Cancelar</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

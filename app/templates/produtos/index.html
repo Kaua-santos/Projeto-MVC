@@ -1,0 +1,413 @@
+<!-- produtos/index.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #0d0f12;
+            --surface:   #141720;
+            --surface2:  #1c2030;
+            --border:    #252a3a;
+            --accent:    #e8c547;
+            --accent2:   #4a7cf7;
+            --text:      #e2e6f0;
+            --muted:     #6b738a;
+            --danger:    #f05252;
+            --success:   #34d399;
+            --radius:    10px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        /* ── Layout ── */
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        /* ── Header ── */
+        .page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 36px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .page-header h1 span {
+            color: var(--accent);
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+            color: var(--muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color .2s;
+        }
+        .breadcrumb:hover { color: var(--accent); }
+
+        /* ── Alerts ── */
+        .alert {
+            padding: 12px 18px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown .3s ease;
+        }
+        .alert-success {
+            background: rgba(52, 211, 153, .08);
+            border: 1px solid rgba(52, 211, 153, .25);
+            color: var(--success);
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Toolbar ── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+        .search-wrap svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            pointer-events: none;
+        }
+        .search-wrap input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .search-wrap input:focus {
+            border-color: var(--accent2);
+            box-shadow: 0 0 0 3px rgba(74,124,247,.12);
+        }
+        .search-wrap input::placeholder { color: var(--muted); }
+
+        select {
+            padding: 10px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color .2s;
+        }
+        select:focus { border-color: var(--accent2); }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #0d0f12;
+        }
+        .btn-primary:hover { background: #f5d55e; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(232,197,71,.25); }
+
+        .btn-filter {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-filter:hover { border-color: var(--accent2); color: var(--accent2); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            padding: 8px 14px;
+        }
+        .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+        .btn-edit {
+            background: rgba(74,124,247,.1);
+            color: var(--accent2);
+            border: 1px solid rgba(74,124,247,.2);
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+        .btn-edit:hover { background: rgba(74,124,247,.2); }
+
+        .btn-danger {
+            background: rgba(240,82,82,.1);
+            color: var(--danger);
+            border: 1px solid rgba(240,82,82,.2);
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+        .btn-danger:hover { background: rgba(240,82,82,.2); }
+
+        /* ── Table ── */
+        .table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            padding: 14px 20px;
+            text-align: left;
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background .15s;
+        }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--surface2); }
+
+        td {
+            padding: 14px 20px;
+            vertical-align: middle;
+        }
+
+        .product-img {
+            width: 46px;
+            height: 46px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: block;
+        }
+
+        .product-link {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color .2s;
+        }
+        .product-link:hover { color: var(--accent); }
+
+        .badge-cat {
+            display: inline-block;
+            padding: 3px 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .price {
+            font-weight: 500;
+            color: var(--accent);
+            letter-spacing: .5px;
+        }
+
+        .stock {
+            font-weight: 500;
+        }
+        .stock.low { color: var(--danger); }
+
+        .actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .empty-row td {
+            padding: 48px 20px;
+            text-align: center;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        /* ── Footer nav ── */
+        .page-foot {
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <div class="page-header">
+        <h1>Prod<span>utos</span></h1>
+        <a href="/" class="breadcrumb">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            Dashboard
+        </a>
+    </div>
+
+    {% if request.query_params.get('criado') == 'ok' %}
+        <div class="alert alert-success">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            Produto criado com sucesso!
+        </div>
+    {% endif %}
+    {% if request.query_params.get('desativado') == 'ok' %}
+        <div class="alert alert-success">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            Produto desativado.
+        </div>
+    {% endif %}
+
+    <!-- Filtros + ação -->
+    <form method="get" action="/produtos">
+        <div class="toolbar">
+            <div class="search-wrap">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input type="text" name="busca" placeholder="Buscar por nome..." value="{{ busca }}">
+            </div>
+
+            <select name="categoria_id">
+                <option value="0">Todas as categorias</option>
+                {% for c in categorias %}
+                    <option value="{{ c.id }}" {{ 'selected' if categoria_id == c.id else '' }}>{{ c.nome }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-filter">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                Filtrar
+            </button>
+
+            {% if busca or categoria_id %}
+                <a href="/produtos" class="btn btn-ghost">✕ Limpar</a>
+            {% endif %}
+
+            {% if usuario.role == 'admin' %}
+                <a href="/produtos/novo" class="btn btn-primary" style="margin-left:auto">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                    Novo produto
+                </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Imagem</th>
+                    <th>Nome</th>
+                    <th>Categoria</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in produtos %}
+                <tr>
+                    <td>
+                        <img class="product-img" src="{{ p.imagem_url }}" alt="{{ p.nome }}">
+                    </td>
+                    <td>
+                        <a href="/produtos/{{ p.id }}" class="product-link">{{ p.nome }}</a>
+                    </td>
+                    <td>
+                        <span class="badge-cat">{{ p.categoria.nome if p.categoria else "—" }}</span>
+                    </td>
+                    <td class="price">R$ {{ "%.2f"|format(p.preco) }}</td>
+                    <td class="stock {% if p.estoque_atual < 5 %}low{% endif %}">{{ p.estoque_atual }}</td>
+                    <td>
+                        {% if usuario.role == 'admin' %}
+                        <div class="actions-cell">
+                            <a href="/produtos/{{ p.id }}/editar" class="btn btn-edit">Editar</a>
+                            <form action="/produtos/{{ p.id }}/desativar" method="post" style="display:inline"
+                                  onsubmit="return confirm('Desativar {{ p.nome }}?')">
+                                <button type="submit" class="btn btn-danger">Desativar</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+
+                {% if not produtos %}
+                <tr class="empty-row">
+                    <td colspan="6">Nenhum produto encontrado.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>

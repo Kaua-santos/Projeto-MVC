@@ -1,0 +1,275 @@
+<!-- produtos/detalhe.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ produto.nome }} — AAPM SENAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #0d0f12;
+            --surface:   #141720;
+            --surface2:  #1c2030;
+            --border:    #252a3a;
+            --accent:    #e8c547;
+            --accent2:   #4a7cf7;
+            --text:      #e2e6f0;
+            --muted:     #6b738a;
+            --danger:    #f05252;
+            --success:   #34d399;
+            --radius:    10px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        /* ── Topbar ── */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 36px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+            color: var(--muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color .2s;
+        }
+        .breadcrumb:hover { color: var(--accent); }
+
+        /* ── Alert ── */
+        .alert-success {
+            padding: 12px 18px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            background: rgba(52,211,153,.08);
+            border: 1px solid rgba(52,211,153,.25);
+            color: var(--success);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown .3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Product layout ── */
+        .product-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .product-hero {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+        }
+
+        .product-img-wrap {
+            background: var(--surface2);
+            border-right: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            min-height: 260px;
+        }
+
+        .product-img-wrap img {
+            width: 100%;
+            max-width: 200px;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .product-info {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-cat {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 14px;
+            letter-spacing: .5px;
+        }
+
+        .product-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+            line-height: 1.1;
+            margin-bottom: 28px;
+        }
+
+        /* Stats grid */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .stat-box {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+
+        .stat-box .stat-label {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .stat-box .stat-value {
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .stat-box.price .stat-value { color: var(--accent); }
+
+        /* Actions */
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 11px 20px;
+            border-radius: var(--radius);
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: all .2s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #0d0f12;
+        }
+        .btn-primary:hover { background: #f5d55e; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(232,197,71,.25); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .product-hero { grid-template-columns: 1fr; }
+            .product-img-wrap { border-right: none; border-bottom: 1px solid var(--border); min-height: 200px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <div class="topbar">
+        <a href="/produtos" class="breadcrumb">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            Produtos
+        </a>
+    </div>
+
+    {% if request.query_params.get('editado') == 'ok' %}
+        <div class="alert-success">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            Produto atualizado com sucesso!
+        </div>
+    {% endif %}
+
+    <div class="product-card">
+        <div class="product-hero">
+
+            <div class="product-img-wrap">
+                <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}">
+            </div>
+
+            <div class="product-info">
+                <div>
+                    <span class="product-cat">
+                        {{ produto.categoria.nome if produto.categoria else "Sem categoria" }}
+                    </span>
+                    <h1 class="product-name">{{ produto.nome }}</h1>
+
+                    <div class="stats">
+                        <div class="stat-box price">
+                            <div class="stat-label">Preço</div>
+                            <div class="stat-value">R$ {{ "%.2f"|format(produto.preco) }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Estoque</div>
+                            <div class="stat-value">{{ produto.estoque_atual }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-actions">
+                    {% if usuario.role == 'admin' %}
+                        <a href="/produtos/{{ produto.id }}/editar" class="btn btn-primary">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            Editar produto
+                        </a>
+                    {% endif %}
+                    <a href="/produtos" class="btn btn-ghost">← Voltar</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
