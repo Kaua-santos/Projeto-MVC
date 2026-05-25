@@ -8,6 +8,8 @@ pip install -r requirements.txt
 ```bash
 python -m alembic init migrations
 ```
+
+
 ```bash
 python -m alembic revision --autogenerate -m "Criar tabela usuarios"
 
