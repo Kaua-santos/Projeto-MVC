@@ -186,7 +186,7 @@ async def editar_produto(
     produto_id: int,
     request: Request,
     nome: str          = Form(...),
-    preco: float       = Form(...),
+    preco: str       = Form(...),
     estoque_atual: int = Form(...),
     categoria_id: int  = Form(0),
     imagem: UploadFile = File(None),
