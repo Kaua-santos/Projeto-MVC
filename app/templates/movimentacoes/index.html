@@ -1,0 +1,214 @@
+<!-- templates/movimentacoes/index.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movimentações — AAPM SENAI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --surface: #111118; --border: #1e1e2e;
+      --accent: #7c6dfa; --accent2: #4fd1b5;
+      --text: #f0eeff; --muted: #7a7a9a; --card-bg: #13131c;
+      --danger: #f87171; --green: #4ade80;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px; opacity: 0.25; pointer-events: none; z-index: 0;
+    }
+    .blob { position: fixed; border-radius: 50%; filter: blur(110px); opacity: 0.08; pointer-events: none; z-index: 0; }
+    .blob-1 { width: 450px; height: 450px; background: var(--accent); top: -120px; right: -80px; }
+    .blob-2 { width: 300px; height: 300px; background: var(--accent2); bottom: -60px; left: -60px; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(10,10,15,0.88); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem;
+      color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+    main { position: relative; z-index: 1; max-width: 1060px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+
+    /* HEADER */
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.75rem; opacity: 0; animation: fadeUp 0.5s ease 0.1s forwards;
+    }
+    .page-header h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.9rem; letter-spacing: -0.04em; }
+    .btn-new {
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 500;
+      color: #fff; background: var(--accent); border: none; border-radius: 8px;
+      padding: 0.6rem 1.25rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-new:hover { opacity: 0.85; transform: translateY(-2px); }
+
+    /* FILTROS */
+    .filters {
+      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.25rem;
+      opacity: 0; animation: fadeUp 0.5s ease 0.2s forwards;
+    }
+    .filters select {
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.5rem 0.85rem; outline: none;
+      appearance: none; cursor: pointer; transition: border-color 0.2s;
+    }
+    .filters select:focus { border-color: var(--accent); }
+    .btn-filter {
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 500;
+      color: var(--text); background: rgba(124,109,250,0.12); border: 1px solid rgba(124,109,250,0.25);
+      border-radius: 8px; padding: 0.5rem 1.1rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-filter:hover { background: rgba(124,109,250,0.2); }
+    .btn-clear {
+      font-size: 0.82rem; color: var(--muted); text-decoration: none;
+      padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-clear:hover { color: var(--text); border-color: #3a3a5a; }
+
+    /* TABLE */
+    .table-wrap {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+      opacity: 0; animation: fadeUp 0.6s ease 0.3s forwards;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    thead tr { border-bottom: 1px solid var(--border); }
+    thead th { padding: 0.85rem 1.25rem; text-align: left; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    tbody tr { border-bottom: 1px solid rgba(30,30,46,0.7); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(124,109,250,0.04); }
+    td { padding: 0.9rem 1.25rem; color: var(--muted); vertical-align: middle; }
+    td:first-child { color: var(--text); }
+
+    .link-produto { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .link-produto:hover { text-decoration: underline; }
+
+    .badge-entrada { display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+    .badge-saida   { display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: rgba(248,113,113,0.1); color: var(--danger); border: 1px solid rgba(248,113,113,0.2); }
+
+    .empty-row td { text-align: center; color: var(--muted); padding: 2.5rem; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 1.75rem;
+      font-size: 0.875rem; color: var(--muted); text-decoration: none; transition: color 0.2s;
+      opacity: 0; animation: fadeUp 0.5s ease 0.45s forwards;
+    }
+    .back-link:hover { color: var(--text); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 640px) {
+      nav { padding: 0.9rem 1.25rem; }
+      main { padding: 2rem 1rem 4rem; }
+      .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      thead th:nth-child(5), td:nth-child(5),
+      thead th:nth-child(7), td:nth-child(7) { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<nav>
+  <a href="/" class="nav-logo"><span class="dot"></span>AAPM SENAI</a>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Movimentações</h1>
+    <a href="/movimentacoes/nova" class="btn-new">+ Registrar movimentação</a>
+  </div>
+
+  <!-- Filtros -->
+  <form method="get" action="/movimentacoes" class="filters">
+    <select name="produto_id">
+      <option value="0">Todos os produtos</option>
+      {% for p in produtos %}
+        <option value="{{ p.id }}" {{ 'selected' if produto_id == p.id else '' }}>
+          {{ p.nome }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <select name="tipo">
+      <option value="">Todos os tipos</option>
+      <option value="entrada" {{ 'selected' if tipo == 'entrada' else '' }}>▲ Entrada</option>
+      <option value="saida"   {{ 'selected' if tipo == 'saida'   else '' }}>▼ Saída</option>
+    </select>
+
+    <button type="submit" class="btn-filter">Filtrar</button>
+
+    {% if produto_id or tipo %}
+      <a href="/movimentacoes" class="btn-clear">✕ Limpar</a>
+    {% endif %}
+  </form>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Produto</th>
+          <th>Tipo</th>
+          <th>Qtd.</th>
+          <th>Preço unit.</th>
+          <th>Total</th>
+          <th>Observação</th>
+          <th>Registrado por</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in movimentacoes %}
+        <tr>
+          <td>{{ m.criando_em.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td>
+            <a href="/produtos/{{ m.produto_id }}" class="link-produto">
+              {{ m.produto.nome }}
+            </a>
+          </td>
+          <td>
+            {% if m.tipo.value == 'entrada' %}
+              <span class="badge-entrada">▲ Entrada</span>
+            {% else %}
+              <span class="badge-saida">▼ Saída</span>
+            {% endif %}
+          </td>
+          <td>{{ m.quantidade }}</td>
+          <td>R$ {{ "%.2f"|format(m.preco_unitario) }}</td>
+          <td>R$ {{ "%.2f"|format(m.valor_total) }}</td>
+          <td>{{ m.observacao or "—" }}</td>
+          <td>{{ m.usuario.nome if m.usuario else "—" }}</td>
+        </tr>
+        {% endfor %}
+
+        {% if not movimentacoes %}
+        <tr class="empty-row">
+          <td colspan="8">Nenhuma movimentação encontrada.</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <a href="/" class="back-link">← Dashboard</a>
+</main>
+</body>
+</html>
